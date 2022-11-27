@@ -1,0 +1,311 @@
+#include<stdio.h>
+#include <stdlib.h>
+
+
+#define width 9
+#define height 9
+
+
+
+int main(){
+// before loop that declares all the variables and declares any other variables inside the loops
+    char pdirection, g1buffer, g2buffer;
+    int P2b[2], Prn[2] = {4, 4};
+    int G12b[2], G1rn[2] = {0, 0};
+    int G22b[2], G2rn[2] = {8, 8};
+
+    //declaring the ghosts on the map
+
+    g1buffer = '.';
+    g2buffer = '.';
+
+    //declares the file as file F and retrieves the file from the location, also it declares where the file is located
+
+    FILE* f;
+    f = fopen("C:\\Users\\Roger\\CLionProjects\\Assignment 1 - C Files\\map.txt", "r");
+
+    //Null statement for if the code doesn't work it closes the program
+
+    if (f == NULL) {//load map fail
+        printf("file can't be opened \n");
+    }
+
+    //array that declares the size of the map
+
+    char array[width][height];
+
+    //inputs the map from the file into the declaration of the array
+
+    for (int m=0; m<width; m++){//load map
+        for(int i=0; i<height; i++){
+            if(fscanf(f, "%c ", &array[m][i]) != 1)
+                exit(1);
+        }
+    }
+
+    //Declaration for new variables that control the ghosts
+
+    int breakchecker = 0, ghost1direction = 5, ghost2direction, change = 0;
+
+    //Closes the file
+
+    fclose(f);
+
+
+    //infinite loop function
+
+    while(1==1){
+        breakchecker = 0;
+        for(int j=0; j<width; j++)//print map current
+        {
+            for(int k=0; k<height; k++)
+            {
+                printf("%c  ", array[j][k]);
+                if (array[j][k] == '.'){
+                    breakchecker ++;
+                }
+            }
+            printf("\n");
+        }
+        if (breakchecker == 0){//end of game as all points collected
+            if(g1buffer == ' ' && g2buffer == ' '){
+                printf("you win!");
+                break;
+            }
+
+        }
+
+        if(G1rn[0] == Prn[0] && G1rn[1] == Prn[1]) {
+            printf("you lose!");
+            break;
+        }
+        else if(G2rn[0] == Prn[0] && G2rn[1] == Prn[1]){
+            printf("you lose!");
+            break;
+        }
+
+        scanf("%c",&pdirection);//player intput
+        P2b[0] = Prn[0];
+        P2b[1] = Prn[1];
+        if (pdirection == 'w'){
+            P2b[0] = P2b[0] -1;
+        }
+        else if(pdirection == 's'){
+            P2b[0] = P2b[0] +1;
+        }
+        else if(pdirection == 'a'){
+            P2b[1] = P2b[1] -1;
+        }
+        else if(pdirection == 'd'){
+            P2b[1] = P2b[1] +1;
+        }
+        fflush(stdin);
+
+        //player input valid check
+        if (P2b[0] < 0 || P2b[0] > 8|| P2b[1] < 0 || P2b[1] > 8|| array[P2b[0]][P2b[1]] == 'W'){
+            continue;
+        }
+        else if(pdirection == 'b'){
+            return 101;
+        }
+        else{
+            array[Prn[0]][Prn[1]] = ' ';
+            Prn[0] = P2b[0];
+            Prn[1] = P2b[1];
+            array[P2b[0]][P2b[1]] = 'P';
+        }
+
+
+
+        //ghost code
+        //ghost 1
+        change = 1;
+        if (G1rn[0] == Prn[0]){
+            if(G1rn[1] > Prn[1]){
+                for(int p=Prn[1]; p<=G1rn[1]; p++){
+                    if (array[Prn[0]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if (change == 1){
+                    ghost1direction = 4;
+                }
+            }
+            else if(G1rn[1] < Prn[1]){
+                for(int p=G1rn[1]; p<=Prn[1]; p++){
+                    if (array[Prn[0]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if (change == 1){
+                    ghost1direction = 1;
+                }
+            }
+
+        }
+        else if(G1rn[1] == Prn[1]){
+            if(G1rn[0] > Prn[0]){
+                for(int p=Prn[0]; p<=G1rn[0]; p++){
+                    if (array[Prn[1]][p] == 'W'){
+                        change = 0;
+                    }
+
+                }
+                if (change == 1){
+                    ghost1direction = 10;
+                }
+            }
+            else if(G1rn[0] < Prn[0]){
+                for(int p=G1rn[0]; p<=Prn[0]; p++){
+                    if (array[Prn[1]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if (change == 1){
+                    ghost1direction = 7;
+                }
+            }
+
+        }
+
+        while (1==1) {
+            G12b[0] = G1rn[0];
+            G12b[1] = G1rn[1];
+
+            if (ghost1direction > 9){
+                G12b[0] = G12b[0] -1;
+            }
+            else if(ghost1direction > 6){
+                G12b[0] = G12b[0] +1;
+            }
+            else if(ghost1direction > 3){
+                G12b[1] = G12b[1] -1;
+            }
+            else{
+                G12b[1] = G12b[1] +1;
+            }
+
+            if (G12b[0] < 0 || G12b[0] > 8|| G12b[1] < 0 || G12b[1] > 8|| array[G12b[0]][G12b[1]] == 'W'){
+                ghost1direction = rand() % 13;
+            }
+
+            else{
+                break;
+            }
+
+        }
+
+        array[G1rn[0]][G1rn[1]] = g1buffer;
+        if(array[G12b[0]][G12b[1]] == 'G'){
+            g1buffer = g2buffer;
+        }
+        else {
+            g1buffer = array[G12b[0]][G12b[1]];
+        }
+        G1rn[0] = G12b[0];
+        G1rn[1] = G12b[1];
+        array[G12b[0]][G12b[1]] = 'G';
+
+
+
+
+
+        //ghost2
+        change = 1;
+        if (G2rn[0] == Prn[0]){
+            if(G2rn[1] > Prn[1]){
+                for(int p=Prn[1]; p<=G2rn[1]; p++){
+                    if (array[Prn[0]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if(change == 1){
+                    ghost2direction = 4;
+                }
+            }
+            else if(G2rn[1] < Prn[1]){
+                for(int p=G2rn[1]; p<=Prn[1]; p++){
+                    if (array[Prn[0]][p] == 'W'){
+                        change = 0;
+                    }
+
+                }
+                if(change == 1){
+                    ghost2direction = 1;
+                }
+            }
+
+        }
+        else if(G2rn[1] == Prn[1]){
+            if(G2rn[0] > Prn[0]){
+                for(int p=Prn[0]; p<=G2rn[0]; p++){
+                    if (array[Prn[1]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if(change == 1){
+                    ghost2direction = 10;
+                }
+            }
+            else if(G2rn[0] < Prn[0]){
+                for(int p=G2rn[0]; p<=Prn[0]; p++){
+                    if (array[Prn[1]][p] == 'W'){
+                        change = 0;
+                    }
+                }
+                if(change == 1){
+                    ghost2direction = 7;
+                }
+            }
+
+        }
+
+        while (1==1) {
+            G22b[0] = G2rn[0];
+            G22b[1] = G2rn[1];
+
+            if (ghost2direction > 9){
+                G22b[0] = G22b[0] -1;
+            }
+            else if(ghost2direction > 6){
+                G22b[0] = G22b[0] +1;
+            }
+            else if(ghost2direction > 3){
+                G22b[1] = G22b[1] -1;
+            }
+            else{
+                G22b[1] = G22b[1] +1;
+            }
+
+            if (G22b[0] < 0 || G22b[0] > 8|| G22b[1] < 0 || G22b[1] > 8|| array[G22b[0]][G22b[1]] == 'W'){
+                ghost2direction = rand() % 13;
+            }
+
+            else{
+                break;
+            }
+
+        }
+
+        array[G2rn[0]][G2rn[1]] = g2buffer;
+        if(array[G22b[0]][G22b[1]] == 'G'){
+            g2buffer = g1buffer;
+        }
+        else {
+            g2buffer = array[G22b[0]][G22b[1]];
+        }
+
+        G2rn[0] = G22b[0];
+        G2rn[1] = G22b[1];
+        array[G22b[0]][G22b[1]] = 'G';
+
+
+
+
+    }
+
+
+
+
+
+}
